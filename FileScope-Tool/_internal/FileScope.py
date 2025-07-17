@@ -2,7 +2,7 @@ from Imports import *
 from reportlab.platypus import Image, Paragraph, Spacer, Table
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.styles import getSampleStyleSheet
-from file_analyzer5 import FileAnalyzer
+from file_analyzer import FileAnalyzer
 from tkinter import simpledialog
 from xml.sax.saxutils import escape
 
@@ -220,7 +220,7 @@ class FileScope:
 
         reports_dir = "Reports"
         os.makedirs(reports_dir, exist_ok=True)
-        uploaded_filename = os.path.basename(self.file_path).rsplit('.', 1)[0]  # Get filename without extension
+        uploaded_filename = os.path.basename(self.file_path).rsplit('.', 1)[0] 
         default_filename = f"Report_{uploaded_filename}_{datetime.datetime.now().strftime('%d-%m-%y_%H-%M-%S')}.pdf"
         pdf_path = os.path.join(reports_dir, default_filename)
 
