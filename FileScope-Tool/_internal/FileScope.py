@@ -257,7 +257,7 @@ class FileScope:
         story.append(Paragraph("2. Detection Details", styles['Heading1']))
         detection_info = [
             ["Detection Name / Signature ID", self.analysis_results['detection'].get('name', 'N/A')],
-            ["Detection Engine(s)", "FileScope v1.1 (Static Analysis)"],
+            ["Detection Engine(s)", "FileScope v2.0 (Static Analysis)"],
             ["Severity Level", self.analysis_results['risk']['Level']],
             ["Confidence Score", f"{self.analysis_results['risk']['Score']}/100"],
             ["Detection Timestamp", datetime.datetime.now().strftime('%d-%Y-%m_%H:%M_IST')],
