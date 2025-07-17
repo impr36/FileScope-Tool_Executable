@@ -1,0 +1,16 @@
+matplotlib
+python-magic-bin
+numpy
+PyPDF2
+mutagen
+Pillow
+pydicom
+mido
+py7zr
+rarfile
+pycdlib
+fonttools
+pymediainfo
+striprtf
+tkinterdnd2
+reportlab
