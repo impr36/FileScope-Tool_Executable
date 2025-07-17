@@ -1,7 +1,9 @@
-from Imports import*
-from reportlab.platypus import Image
+from Imports import *
+from reportlab.platypus import Image, Paragraph, Spacer, Table
 from reportlab.lib.utils import ImageReader
-from file_analyzer import FileAnalyzer
+from reportlab.lib.styles import getSampleStyleSheet
+from file_analyzer5 import FileAnalyzer
+from tkinter import simpledialog
 
 class FileScope:
     def __init__(self, root):
@@ -74,6 +76,11 @@ class FileScope:
         self.entropy_canvas = tk.Canvas(entropy_frame, height=200, bg="#1a1c2c", highlightthickness=1, highlightbackground="#5c6bc0")
         self.entropy_canvas.pack(fill="both", expand=True, padx=10)
         self.entropy_canvas.create_text(300, 100, text="Entropy Graph", fill="#b0bec5", font=("Segoe UI", 12, "italic"))
+
+        # Prompt for analyst's name
+        self.analyst_name = simpledialog.askstring("Input", "Enter Analyst Name:", parent=self.root)
+        if not self.analyst_name:
+            self.analyst_name = "Unknown Analyst"  # Default name if none provided
 
         self.file_path = None
         self.analyzer = FileAnalyzer()
@@ -223,6 +230,12 @@ class FileScope:
         styles['Normal'].fontSize = 8
         styles['Normal'].leading = 10
 
+        # Define a Paragraph style for table cells to enable text wrapping
+        table_style = styles['Normal'].clone('TableStyle')
+        table_style.wordWrap = 'CJK'  # Supports wrapping for long text
+        table_style.fontSize = 8
+        table_style.leading = 10
+
         story = [
             Paragraph("FileScope Forensic Report", styles['Title']),
             Spacer(1, 6),
@@ -231,17 +244,17 @@ class FileScope:
         # 1. File Identification
         story.append(Paragraph("1. File Identification", styles['Heading1']))
         file_info = [
-            ["File Name", self.analysis_results['metadata'].get('filename', 'N/A')],
-            ["File Path", self.file_path],
-            ["File Size", f"{os.path.getsize(self.file_path)} bytes"],
-            ["File Type", self.analysis_results['magic']['Detected Type']],
-            ["File Extension", self.analysis_results['magic']['Extension']],
-            ["Timestamp (Creation)", self.analysis_results['metadata'].get('creation_time', 'N/A')],
-            ["Timestamp (Modification)", self.analysis_results['metadata'].get('modification_time', 'N/A')],
-            ["Timestamp (Access)", self.analysis_results['metadata'].get('access_time', 'N/A')],
-            ["MD5", self.analysis_results['hashes'].get('md5', 'N/A')],
-            ["SHA-1", self.analysis_results['hashes'].get('sha1', 'N/A')],
-            ["SHA-256", self.analysis_results['hashes'].get('sha256', 'N/A')],
+            ["File Name", Paragraph(self.analysis_results['metadata'].get('filename', 'N/A'), table_style)],
+            ["File Path", Paragraph(self.file_path, table_style)],
+            ["File Size", Paragraph(f"{os.path.getsize(self.file_path)} bytes", table_style)],
+            ["File Type", Paragraph(self.analysis_results['magic']['Detected Type'], table_style)],
+            ["File Extension", Paragraph(self.analysis_results['magic']['Extension'], table_style)],
+            ["Timestamp (Creation)", Paragraph(self.analysis_results['metadata'].get('creation_time', 'N/A'), table_style)],
+            ["Timestamp (Modification)", Paragraph(self.analysis_results['metadata'].get('modification_time', 'N/A'), table_style)],
+            ["Timestamp (Access)", Paragraph(self.analysis_results['metadata'].get('access_time', 'N/A'), table_style)],
+            ["MD5", Paragraph(self.analysis_results['hashes'].get('md5', 'N/A'), table_style)],
+            ["SHA-1", Paragraph(self.analysis_results['hashes'].get('sha1', 'N/A'), table_style)],
+            ["SHA-256", Paragraph(self.analysis_results['hashes'].get('sha256', 'N/A'), table_style)],
         ]
         table = Table(file_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -256,11 +269,11 @@ class FileScope:
         story.append(Spacer(1, 6))
         story.append(Paragraph("2. Detection Details", styles['Heading1']))
         detection_info = [
-            ["Detection Name / Signature ID", self.analysis_results['detection'].get('name', 'N/A')],
-            ["Detection Engine(s)", "FileScope v2.0 (Static Analysis)"],
-            ["Severity Level", self.analysis_results['risk']['Level']],
-            ["Confidence Score", f"{self.analysis_results['risk']['Score']}/100"],
-            ["Detection Timestamp", datetime.datetime.now().strftime('%d-%Y-%m_%H:%M_IST')],
+            ["Name / Signature ID", Paragraph(self.analysis_results['detection'].get('name', 'N/A'), table_style)],
+            ["Detection Engine(s)", Paragraph("FileScope v2.0 (Static Analysis)", table_style)],
+            ["Severity Level", Paragraph(self.analysis_results['risk']['Level'], table_style)],
+            ["Confidence Score", Paragraph(f"{self.analysis_results['risk']['Score']}/100", table_style)],
+            ["Detection Timestamp", Paragraph(datetime.datetime.now().strftime('%d-%Y-%m_%H:%M_IST'), table_style)],
         ]
         table = Table(detection_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -276,13 +289,13 @@ class FileScope:
         story.append(Paragraph("3. Behavioral Analysis", styles['Heading1']))
         story.append(Paragraph("Note: Dynamic analysis not performed. Placeholder data shown.", styles['Normal']))
         behavior_info = [
-            ["Processes Spawned", "N/A"],
-            ["Network Activity", "N/A"],
-            ["Registry Changes", "N/A"],
-            ["File System Modifications", "N/A"],
-            ["Persistence Mechanisms", "N/A"],
-            ["Dropped Files", "N/A"],
-            ["Command and Control (C2) Indicators", "N/A"],
+            ["Processes Spawned", Paragraph("N/A", table_style)],
+            ["Network Activity", Paragraph("N/A", table_style)],
+            ["Registry Changes", Paragraph("N/A", table_style)],
+            ["File System Modifications", Paragraph("N/A", table_style)],
+            ["Persistence Mechanisms", Paragraph("N/A", table_style)],
+            ["Dropped Files", Paragraph("N/A", table_style)],
+            ["C2 Indicators", Paragraph("N/A", table_style)],
         ]
         table = Table(behavior_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -297,13 +310,13 @@ class FileScope:
         story.append(Spacer(1, 6))
         story.append(Paragraph("4. Static Analysis Details", styles['Heading1']))
         static_info = [
-            ["Strings Found", self.analysis_results['static'].get('strings', 'N/A')],
-            ["Packers or Obfuscation", self.analysis_results['static'].get('obfuscation', 'N/A')],
-            ["Embedded Resources", str(self.analysis_results['magic'].get('Embedded Objects', 'None'))],
-            ["Digital Signature", self.analysis_results['static'].get('signature', 'N/A')],
-            ["Imports/Exports", self.analysis_results['pe'].get('Analyzed', False) and self.analysis_results['pe'].get('Imports', 'N/A') or 'N/A'],
-            ["Entropy Level", f"Mean {self.analysis_results['entropy']['Mean Entropy']}, Overall {self.analysis_results['entropy']['Overall Entropy']}"],
-            ["Notes", self.analysis_results['static'].get('notes', 'N/A')],
+            ["Strings Found", Paragraph(str(self.analysis_results['static'].get('strings', 'N/A')), table_style)],
+            ["Packers or Obfuscation", Paragraph(self.analysis_results['static'].get('obfuscation', 'N/A'), table_style)],
+            ["Embedded Resources", Paragraph(str(self.analysis_results['magic'].get('Embedded Objects', 'None')), table_style)],
+            ["Digital Signature", Paragraph(self.analysis_results['static'].get('signature', 'N/A'), table_style)],
+            ["Imports/Exports", Paragraph(self.analysis_results['pe'].get('Analyzed', False) and self.analysis_results['pe'].get('Imports', 'N/A') or 'N/A', table_style)],
+            ["Entropy Level", Paragraph(f"Mean {self.analysis_results['entropy']['Mean Entropy']}, Overall {self.analysis_results['entropy']['Overall Entropy']}", table_style)],
+            ["Notes", Paragraph(self.analysis_results['static'].get('notes', 'N/A'), table_style)],
         ]
         table = Table(static_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -319,10 +332,10 @@ class FileScope:
         story.append(Paragraph("5. Threat Intelligence", styles['Heading1']))
         story.append(Paragraph("Note: Threat intelligence requires external database integration. Placeholder data shown.", styles['Normal']))
         threat_info = [
-            ["Known Malicious Hashes", "N/A"],
-            ["Related Threat Campaigns", "N/A"],
-            ["Reputation Data", "N/A"],
-            ["MITRE ATT&CK Mapping", "N/A"],
+            ["Known Malicious Hashes", Paragraph("N/A", table_style)],
+            ["Related Threat Campaigns", Paragraph("N/A", table_style)],
+            ["Reputation Data", Paragraph("N/A", table_style)],
+            ["MITRE ATT&CK Mapping", Paragraph("N/A", table_style)],
         ]
         table = Table(threat_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -337,10 +350,10 @@ class FileScope:
         story.append(Spacer(1, 6))
         story.append(Paragraph("6. Remediation and Recommendations", styles['Heading1']))
         remediation_info = [
-            ["Suggested Actions", "Quarantine the file immediately. DO NOT run on production systems." if self.analysis_results['risk']['Level'] == "HIGH" else "Verify before execution."],
-            ["System Cleanup Instructions", "Remove file if confirmed malicious."],
-            ["Indicators of Compromise (IOCs)", self.analysis_results['hashes'].get('sha256', 'N/A')],
-            ["Preventive Measures", "Update antivirus and apply patches."],
+            ["Suggested Actions", Paragraph("Quarantine the file immediately. DO NOT run on production systems." if self.analysis_results['risk']['Level'] == "HIGH" else "Verify before execution.", table_style)],
+            ["System Cleanup Instructions", Paragraph("Remove file if confirmed malicious.", table_style)],
+            ["Indicators of Compromise", Paragraph(self.analysis_results['hashes'].get('sha256', 'N/A'), table_style)],
+            ["Preventive Measures", Paragraph("Update antivirus and apply patches.", table_style)],
         ]
         table = Table(remediation_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -356,10 +369,10 @@ class FileScope:
         story.append(Paragraph("7. Report Metadata", styles['Heading1']))
         import random
         metadata_info = [
-            ["Report Generated By", "FileScope v2.0"],
-            ["Analyst Name", "Pratyush"],
-            ["Report Timestamp", datetime.datetime.now().strftime('%d-%Y-%m_%H:%M_IST')],
-            ["Case or Incident ID", random.randint(0, 999)],
+            ["Report Generated By", Paragraph("FileScope v2.0", table_style)],
+            ["Analyst Name", Paragraph(self.analyst_name, table_style)],
+            ["Report Timestamp", Paragraph(datetime.datetime.now().strftime('%d-%Y-%m_%H:%M_IST'), table_style)],
+            ["Case or Incident ID", Paragraph(str(random.randint(0, 999)), table_style)],
         ]
         table = Table(metadata_info, colWidths=[1.5*inch, 4.5*inch])
         table.setStyle([
@@ -370,7 +383,7 @@ class FileScope:
         ])
         story.append(table)
 
-        # 8 Entropy Graph
+        # 8. Entropy Graph
         graph_buffer = self.analyzer.generate_entropy_graph(self.analysis_results.get("entropy_chunks", []))
         if graph_buffer:
             story.append(Spacer(1, 6))
