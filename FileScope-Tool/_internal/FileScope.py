@@ -4,6 +4,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib.styles import getSampleStyleSheet
 from file_analyzer5 import FileAnalyzer
 from tkinter import simpledialog
+import escape
 
 class FileScope:
     def __init__(self, root):
@@ -244,7 +245,7 @@ class FileScope:
         # 1. File Identification
         story.append(Paragraph("1. File Identification", styles['Heading1']))
         file_info = [
-            ["File Name", Paragraph(self.analysis_results['metadata'].get('filename', 'N/A'), table_style)],
+            ["File Name", os.path.basename(self.file_path)],
             ["File Path", Paragraph(self.file_path, table_style)],
             ["File Size", Paragraph(f"{os.path.getsize(self.file_path)} bytes", table_style)],
             ["File Type", Paragraph(self.analysis_results['magic']['Detected Type'], table_style)],
