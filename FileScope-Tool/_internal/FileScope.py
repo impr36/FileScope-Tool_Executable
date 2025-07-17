@@ -4,7 +4,7 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib.styles import getSampleStyleSheet
 from file_analyzer5 import FileAnalyzer
 from tkinter import simpledialog
-import escape
+from xml.sax.saxutils import escape
 
 class FileScope:
     def __init__(self, root):
@@ -310,8 +310,10 @@ class FileScope:
         # 4. Static Analysis Details
         story.append(Spacer(1, 6))
         story.append(Paragraph("4. Static Analysis Details", styles['Heading1']))
+        strings_raw = str(self.analysis_results['static'].get('strings', 'N/A'))
+        strings_safe = escape(strings_raw)
         static_info = [
-            ["Strings Found", Paragraph(str(self.analysis_results['static'].get('strings', 'N/A')), table_style)],
+            ["Strings Found", Paragraph(strings_safe, table_style)],
             ["Packers or Obfuscation", Paragraph(self.analysis_results['static'].get('obfuscation', 'N/A'), table_style)],
             ["Embedded Resources", Paragraph(str(self.analysis_results['magic'].get('Embedded Objects', 'None')), table_style)],
             ["Digital Signature", Paragraph(self.analysis_results['static'].get('signature', 'N/A'), table_style)],
