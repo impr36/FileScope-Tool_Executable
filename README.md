@@ -1,4 +1,4 @@
-# 🔍 FileScope
+# 🔍 FileScope(.exe)
 
 **See Beyond the Surface of Your Files**
 
